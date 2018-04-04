@@ -11,7 +11,7 @@ import UIKit
 class ViewController: UITableViewController {
 
     
-    let itemArray = ["Adin", "Dva", "Tri"]
+    var itemArray = ["Adin", "Dva", "Tri"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,7 +40,26 @@ class ViewController: UITableViewController {
         } else {
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
         }
-
     }
+    
+    //MARK - Add new item
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        
+        var textField = UITextField()
+        
+        let alert = UIAlertController(title: "You are amazing", message: "", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+            self.itemArray.append(textField.text!)
+            self.tableView.reloadData()
+        }
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Add your awesome task"
+            textField = alertTextField
+        }
+        alert.addAction(action)
+        present(alert,animated: true, completion: nil)
+    }
+    
 }
 

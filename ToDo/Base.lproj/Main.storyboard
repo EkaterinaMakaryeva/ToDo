@@ -53,7 +53,7 @@
             </objects>
             <point key="canvasLocation" x="1334" y="90"/>
         </scene>
-        <!--Napoleon Plans-->
+        <!--Incredible Plans-->
         <scene sceneID="ML1-4W-YPd">
             <objects>
                 <tableViewController id="Hrw-Zy-obn" customClass="CategoryTableViewController" customModule="ToDo" customModuleProvider="target" sceneMemberID="viewController">
@@ -76,7 +76,7 @@
                             <outlet property="delegate" destination="Hrw-Zy-obn" id="TDf-VE-pCV"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Napoleon Plans" id="XNA-nU-NLG">
+                    <navigationItem key="navigationItem" title="Incredible Plans" id="XNA-nU-NLG">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="IFJ-Py-8ta">
                             <color key="tintColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>

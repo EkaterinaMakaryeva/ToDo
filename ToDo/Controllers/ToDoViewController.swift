@@ -8,8 +8,9 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
-class ViewController: UITableViewController {
+class ToDoViewController: SwipeCellViewController {
     
     let realm = try! Realm()
     var toDoItems: Results<Item>?
@@ -18,22 +19,44 @@ class ViewController: UITableViewController {
             loadItems()
         }
     }
-
+    
+    
+    @IBOutlet weak var searchBar: UISearchBar!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
     }
     
-    //MARK - TableView Datasource Methods
+    override func viewWillAppear(_ animated: Bool) {
+        title = selectedCategory?.name
+        //remove separators around searchBar
+        searchBar.barTintColor = FlatWhite()
+        searchBar.isTranslucent = false
+        searchBar.backgroundImage = UIImage()
+    }
+    override func updateNavBar() {
+        super.updateNavBar()
+    }
+    //MARK: - TableView Datasource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return toDoItems?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         if let item = toDoItems?[indexPath.row] {
             cell.textLabel?.text = item.title
+            if let colour = FlatWhite().darken(byPercentage: (CGFloat(indexPath.row)/CGFloat(toDoItems!.count))/2) {
+                cell.backgroundColor = colour
+                cell.textLabel?.textColor = ContrastColorOf(colour, returnFlat: true)
+                cell.tintColor = ContrastColorOf(colour, returnFlat: true)
+                
+//                tableView.backgroundColor = toDoItems!.count >= 2 ? colour : FlatWhite()
+                tableView.backgroundColor = cell.backgroundColor
+                
+            }
             cell.accessoryType = item.done == true ? .checkmark : .none
         } else {
             cell.textLabel?.text = "No ToDo's To Do"
@@ -95,18 +118,28 @@ class ViewController: UITableViewController {
         tableView.reloadData()
     }
     
-
+    override func updateModel(at indexPath: IndexPath) {
+        if let itemForDeletion = self.toDoItems?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    self.realm.delete(itemForDeletion)
+                }
+            } catch {
+                print("Error deleting item, \(error)")
+            }
+        }
+    }
 }
 
 //MARK: - Search Bar methods
 
-extension ViewController: UISearchBarDelegate {
-
+extension ToDoViewController: UISearchBarDelegate {
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         toDoItems = toDoItems?.filter("title CONTAINS[cd] %@", searchBar.text!)
         tableView.reloadData()
     }
-
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchBar.text?.count == 0 {
             loadItems()

@@ -8,8 +8,9 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
-class CategoryTableViewController: UITableViewController {
+class CategoryTableViewController: SwipeCellViewController {
     
     let realm = try! Realm()
     var categories: Results<Category>?
@@ -19,7 +20,9 @@ class CategoryTableViewController: UITableViewController {
         loadCategories()
     
     }
-   
+    override func updateNavBar() {
+        super.updateNavBar()
+    }
     //MARK: - Add new Categories
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
@@ -48,8 +51,10 @@ class CategoryTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         cell.textLabel?.text = categories?[indexPath.row].name ?? "No Incredible Plans Yet"
+        cell.backgroundColor = FlatWhite()
+        cell.textLabel?.textColor = FlatBlackDark()
         return cell
     }
     
@@ -57,13 +62,15 @@ class CategoryTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "goToItems", sender: self)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let destinationVC = segue.destination as! ViewController
+        let destinationVC = segue.destination as! ToDoViewController
         if let indexPath = tableView.indexPathForSelectedRow {
             destinationVC.selectedCategory = categories?[indexPath.row]
         }
+
     }
     //MARK: - Data Manupulation Methods
     
@@ -81,6 +88,18 @@ class CategoryTableViewController: UITableViewController {
     func loadCategories() {
         categories = realm.objects(Category.self)
         tableView.reloadData()
+    }
+    
+    override func updateModel(at indexPath: IndexPath) {
+        if let categoryForDeletion = self.categories?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    self.realm.delete(categoryForDeletion)
+                }
+            } catch {
+                print("Error deleting category, \(error)")
+            }
+        }
     }
     
 }
